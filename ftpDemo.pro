@@ -27,9 +27,11 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += main.cpp \
         maindialog.cpp \
-    ftpmanager.cpp
+    ftpmanager.cpp \
+    ftpuploadthread.cpp
 
 HEADERS  += maindialog.h \
-    ftpmanager.h
+    ftpmanager.h \
+    ftpuploadthread.h
 
 FORMS    += maindialog.ui

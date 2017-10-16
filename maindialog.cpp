@@ -9,6 +9,13 @@ MainDialog::MainDialog(QWidget *parent) :
 	ui->setupUi(this);
 	m_pFtpManager = new FtpManager("192.168.1.145", 21,
 								   "Administrator", "za123.", 0);
+	m_pFtpThread = new FtpUploadThread(m_pFtpManager);
+	m_pFtpManager->moveToThread(m_pFtpThread);
+
+	connect(m_pFtpManager, SIGNAL(notifyUploadFinish()), m_pFtpThread, SLOT(finish()));
+	connect(m_pFtpManager, SIGNAL(notifyDownloadFinish()), m_pFtpThread, SLOT(finish()));
+
+
 //	m_pFtpManager = new FtpManager("192.168.1.123", 21,
 //								   "wq", "123", 0);
 
@@ -16,12 +23,16 @@ MainDialog::MainDialog(QWidget *parent) :
 			this, SLOT(getError(int)));
 	connect(m_pFtpManager, SIGNAL(notifyUploadFinish()), this, SLOT(finish()));
 	connect(m_pFtpManager, SIGNAL(notifyDownloadFinish()), this, SLOT(finish()));
+	connect(m_pFtpThread, SIGNAL(updateFileFinished(qint64,qint64)),
+			this, SLOT(updateProgress(qint64,qint64)));
+
 }
 
 MainDialog::~MainDialog()
 {
 	delete ui;
 	delete m_pFtpManager;
+	delete m_pFtpThread;
 }
 
 void MainDialog::updateProgress(qint64 bytesSent, qint64 bytesTotal)
@@ -89,4 +100,18 @@ void MainDialog::on_btnUpload_clicked()
 void MainDialog::on_btnUpdate_clicked()
 {
 
+}
+
+void MainDialog::on_btnDirUp_clicked()
+{
+	ui->btnDirUp->setEnabled(false);
+	ui->btnUpload->setEnabled(false);
+	ui->btnDownload->setEnabled(false);
+
+	m_pFtpThread->addFileToUpload("/home/wq/Downloads/gs.0000020170911.log");
+	m_pFtpThread->addFileToUpload("/home/wq/Downloads/gs.0000020170912.log");
+	m_pFtpThread->addFileToUpload("/home/wq/Downloads/gs.0000020170913.log");
+	m_pFtpThread->addFileToUpload("/home/wq/Downloads/gs.0000020170914.log");
+
+	m_pFtpThread->start();
 }
