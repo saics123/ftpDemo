@@ -25,7 +25,7 @@ private:
 private slots:
 	void updateProgress(qint64 bytesSent, qint64 bytesTotal);// 更新进度
 	void finish();//完成传输
-	void getError(int error);//处理错误
+	void getError(const QString &error);//处理错误
 
 	void on_btnDownload_clicked();
 	void on_btnUpload_clicked();

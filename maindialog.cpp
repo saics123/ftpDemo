@@ -7,25 +7,18 @@ MainDialog::MainDialog(QWidget *parent) :
 	ui(new Ui::MainDialog)
 {
 	ui->setupUi(this);
-	m_pFtpManager = new FtpManager("192.168.1.145", 21,
-								   "Administrator", "za123.", 0);
+	m_pFtpManager= new FtpManager("192.168.1.145", 21,
+								  "Administrator", "za123.", 0);
 	m_pFtpThread = new FtpUploadThread(m_pFtpManager);
-	m_pFtpManager->moveToThread(m_pFtpThread);
-
-	connect(m_pFtpManager, SIGNAL(notifyUploadFinish()), m_pFtpThread, SLOT(finish()));
-	connect(m_pFtpManager, SIGNAL(notifyDownloadFinish()), m_pFtpThread, SLOT(finish()));
-
 
 //	m_pFtpManager = new FtpManager("192.168.1.123", 21,
 //								   "wq", "123", 0);
 
-	connect(m_pFtpManager, SIGNAL(error(int)),
-			this, SLOT(getError(int)));
-	connect(m_pFtpManager, SIGNAL(notifyUploadFinish()), this, SLOT(finish()));
-	connect(m_pFtpManager, SIGNAL(notifyDownloadFinish()), this, SLOT(finish()));
-	connect(m_pFtpThread, SIGNAL(updateFileFinished(qint64,qint64)),
+	connect(m_pFtpThread, SIGNAL(notifyError(QString)),
+			this, SLOT(getError(QString)));
+	connect(m_pFtpThread, SIGNAL(notifyUploadFinish()), this, SLOT(finish()));
+	connect(m_pFtpThread, SIGNAL(updateTotalProgress(qint64,qint64)),
 			this, SLOT(updateProgress(qint64,qint64)));
-
 }
 
 MainDialog::~MainDialog()
@@ -53,11 +46,9 @@ void MainDialog::finish()
 	ui->teMsg->append("传输结束");
 }
 
-void MainDialog::getError(int error)
+void MainDialog::getError(const QString& error)
 {
-	ui->teMsg->append(QString("错误：%1 %2")
-					  .arg(error)
-					  .arg(FtpManager::toString(error)));
+	ui->teMsg->append(QString("错误：" + error));
 }
 
 void MainDialog::on_btnDownload_clicked()
@@ -113,5 +104,5 @@ void MainDialog::on_btnDirUp_clicked()
 	m_pFtpThread->addFileToUpload("/home/wq/Downloads/gs.0000020170913.log");
 	m_pFtpThread->addFileToUpload("/home/wq/Downloads/gs.0000020170914.log");
 
-	m_pFtpThread->start();
+	emit m_pFtpThread->start();
 }
