@@ -1,6 +1,7 @@
 #include "ftpuploadthread.h"
 #include <unistd.h>
 #include <QDebug>
+#include <QApplication>
 
 FtpUploadThread::FtpUploadThread(FtpManager *pFtpManager, QObject *parent)
 	:QObject(parent)
@@ -11,13 +12,21 @@ FtpUploadThread::FtpUploadThread(FtpManager *pFtpManager, QObject *parent)
 	m_currentErr = 0;
 	m_currentFile.clear();
 	m_pThread = new QThread(0);
-	this->moveToThread(m_pThread);
-	//m_pFtpManager->moveToThread(m_pThread);
 
+	//m_pFtpManager->moveToThread(m_pThread);
+	this->moveToThread(m_pThread);
+//	connect(m_pFtpManager, SIGNAL(notifyDownProgress(qint64,qint64)),
+//			this, SIGNAL(updateCurrenProgress(qint64,qint64)), Qt::DirectConnection);
+//	connect(m_pFtpManager, SIGNAL(notifyUpProgress(qint64,qint64)),
+//			this, SIGNAL(updateCurrenProgress(qint64,qint64)), Qt::DirectConnection);
+//	connect(m_pFtpManager, SIGNAL(notifyUploadFinish()), this, SLOT(finish()), Qt::DirectConnection);
+//	connect(m_pFtpManager, SIGNAL(notifyDownloadFinish()), this, SLOT(finish()), Qt::DirectConnection);
+//	connect(m_pFtpManager, SIGNAL(error(int)), this, SLOT(receiveError(int)), Qt::DirectConnection);
 	connect(m_pFtpManager, SIGNAL(notifyDownProgress(qint64,qint64)),
 			this, SIGNAL(updateCurrenProgress(qint64,qint64)));
 	connect(m_pFtpManager, SIGNAL(notifyUpProgress(qint64,qint64)),
 			this, SIGNAL(updateCurrenProgress(qint64,qint64)));
+
 	connect(m_pFtpManager, SIGNAL(notifyUploadFinish()), this, SLOT(finish()));
 	connect(m_pFtpManager, SIGNAL(notifyDownloadFinish()), this, SLOT(finish()));
 	connect(m_pFtpManager, SIGNAL(error(int)), this, SLOT(receiveError(int)));
@@ -68,7 +77,8 @@ void FtpUploadThread::doRun()
 			emit m_pFtpManager->pleaseUpload(srcPath, desPath);
 			//m_pFtpManager->asynchronousUp(srcPath, desPath);
 		}else{//休眠20ms
-			usleep(20 * 1e3);
+			//usleep(20 * 1e3);
+			QApplication::processEvents(QEventLoop::AllEvents, 10 * 1e3);
 		}
 	}
 }
@@ -78,6 +88,9 @@ void FtpUploadThread::finish()
 	m_isBusy = false;
 	m_finishedMount++;
 	emit updateTotalProgress(m_finishedMount, m_totalMount);
+	if(m_finishedMount == m_totalMount){
+		emit notifyFinish();
+	}
 }
 
 void FtpUploadThread::receiveError(int error)
@@ -90,6 +103,11 @@ void FtpUploadThread::receiveError(int error)
 void FtpUploadThread::clearError()
 {
 	m_errList.clear();
+}
+
+const QString FtpUploadThread::currentFile()
+{
+	return m_currentFile;
 }
 
 

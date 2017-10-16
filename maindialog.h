@@ -23,7 +23,8 @@ private:
 	FtpUploadThread* m_pFtpThread;
 
 private slots:
-	void updateProgress(qint64 bytesSent, qint64 bytesTotal);// 更新进度
+	void updateFileProgress(qint64 bytesSent, qint64 bytesTotal);// 更新进度
+	void updateTotalProgress(qint64 bytesSent, qint64 bytesTotal);// 更新进度
 	void finish();//完成传输
 	void getError(const QString &error);//处理错误
 

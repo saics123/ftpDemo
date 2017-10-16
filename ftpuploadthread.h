@@ -15,6 +15,7 @@ public:
 	~FtpUploadThread();
 	void addFileToUpload(const QString &filePath);
 	void clearError();//清除错误表
+	const QString currentFile();
 
 private:
 	bool m_shouldStop;
@@ -40,6 +41,7 @@ signals:
 	void notifyUploadFinish();
 	void start();
 	void notifyError(QString);
+	void notifyFinish();
 };
 
 #endif // FTPUPLOADTHREAD_H

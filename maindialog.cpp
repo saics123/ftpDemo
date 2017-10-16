@@ -17,8 +17,11 @@ MainDialog::MainDialog(QWidget *parent) :
 	connect(m_pFtpThread, SIGNAL(notifyError(QString)),
 			this, SLOT(getError(QString)));
 	connect(m_pFtpThread, SIGNAL(notifyUploadFinish()), this, SLOT(finish()));
+	connect(m_pFtpThread, SIGNAL(updateCurrenProgress(qint64,qint64)),
+			this, SLOT(updateFileProgress(qint64,qint64)));
 	connect(m_pFtpThread, SIGNAL(updateTotalProgress(qint64,qint64)),
-			this, SLOT(updateProgress(qint64,qint64)));
+			this, SLOT(updateTotalProgress(qint64,qint64)));
+	connect(m_pFtpThread, SIGNAL(notifyFinish()), this, SLOT(finish()));
 }
 
 MainDialog::~MainDialog()
@@ -28,14 +31,28 @@ MainDialog::~MainDialog()
 	delete m_pFtpThread;
 }
 
-void MainDialog::updateProgress(qint64 bytesSent, qint64 bytesTotal)
+void MainDialog::updateFileProgress(qint64 bytesSent, qint64 bytesTotal)
 {
 	//更新进度条
 	//如果传输失败，会发来bytesTotal = 0；此时进度条会不断左右移动。
 	//在这种情况下不应该更新进度条
 	if(bytesTotal != 0){
-		ui->progressBar->setMaximum(bytesTotal);
-		ui->progressBar->setValue(bytesSent);
+		//显示当前文件路径
+		ui->lbCurrentFile->setText("当前文件：" + m_pFtpThread->currentFile());
+		//显示进度
+		ui->pbCurrentFile->setMaximum(bytesTotal);
+		ui->pbCurrentFile->setValue(bytesSent);
+	}
+}
+
+void MainDialog::updateTotalProgress(qint64 bytesSent, qint64 bytesTotal)
+{
+	//更新进度条
+	//如果传输失败，会发来bytesTotal = 0；此时进度条会不断左右移动。
+	//在这种情况下不应该更新进度条
+	if(bytesTotal != 0){
+		ui->pbTotal->setMaximum(bytesTotal);
+		ui->pbTotal->setValue(bytesSent);
 	}
 }
 

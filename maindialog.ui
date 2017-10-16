@@ -7,13 +7,13 @@
     <x>0</x>
     <y>0</y>
     <width>428</width>
-    <height>471</height>
+    <height>528</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainDialog</string>
   </property>
-  <widget class="QProgressBar" name="progressBar">
+  <widget class="QProgressBar" name="pbCurrentFile">
    <property name="geometry">
     <rect>
      <x>20</x>
@@ -101,7 +101,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="QLabel" name="lbMsg">
+  <widget class="QLabel" name="lbCurrentFile">
    <property name="geometry">
     <rect>
      <x>20</x>
@@ -118,7 +118,7 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>350</y>
+     <y>390</y>
      <width>391</width>
      <height>111</height>
     </rect>
@@ -158,6 +158,19 @@
    </property>
    <property name="text">
     <string>文件夹上传</string>
+   </property>
+  </widget>
+  <widget class="QProgressBar" name="pbTotal">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>350</y>
+     <width>391</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="value">
+    <number>0</number>
    </property>
   </widget>
  </widget>
